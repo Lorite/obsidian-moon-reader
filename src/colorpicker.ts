@@ -1,5 +1,5 @@
 import { App, FuzzyMatch, FuzzySuggestModal } from 'obsidian';
-import integerToRGBA from './util';
+import * as utilsFunctions from './util';
 
 export class ColorPicker extends FuzzySuggestModal<number> {
 	suggestions: number[];
@@ -20,7 +20,7 @@ export class ColorPicker extends FuzzySuggestModal<number> {
 	}
 
 	getItemText(item: number): string {
-		return `${integerToRGBA(item)}`;
+		return `${utilsFunctions.integerToRGBA(item)}`;
 	}
 
 	onChooseItem(item: number ,_evt: MouseEvent | KeyboardEvent): void {
@@ -58,8 +58,8 @@ export class ColorPicker extends FuzzySuggestModal<number> {
 	renderSuggestion(item: FuzzyMatch<number>, el: HTMLElement): void {
 		el.addClass("colorpicker");
 		const colorDiv = el.createDiv("color-box");
-		colorDiv.style.backgroundColor = `#${integerToRGBA(item.item).slice(0,6)}`;
+		colorDiv.style.backgroundColor = `#${utilsFunctions.integerToRGBA(item.item).slice(0,6)}`;
 		const div = el.createDiv();
-		div.setText(`${integerToRGBA(item.item).slice(0,6)}`);
+		div.setText(`${utilsFunctions.integerToRGBA(item.item).slice(0,6)}`);
 	}
 }
