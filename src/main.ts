@@ -21,18 +21,18 @@ export default class MoonReader extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		this.addRibbonIcon('book', 'Moon Reader', async () => await this.start());
+		this.addRibbonIcon('book', 'Moon Reader', async () => await this.parse_export());
 
 		this.addCommand({
 			id: 'parse-exports',
 			name: 'Parse an export',
 			editorCallback: async () =>
-				await this.start()
+				await this.parse_export()
 		});
 		this.addSettingTab(new SettingsTab(this.app, this));
 	}
 
-	async start() {
+	async parse_export() {
 		const currentTFile = this.app.workspace.getActiveFile();
 		if (!currentTFile) {
 			new Notice("No active file!");
@@ -69,6 +69,7 @@ export default class MoonReader extends Plugin {
 		if (parsedOutput) {
 			const colorChoices = new Set<number>();
 			parsedOutput.forEach(t => colorChoices.add(t.signedColor))
+			colorChoices.add(0);
 			const colorModal = new ColorPicker(this.app, Array.from(colorChoices));
 			const colorChoice = await colorModal.openAndGetValue()
 			// .catch(e=>console.log(e));

@@ -1,6 +1,6 @@
 import {Annotation} from 'src/types';
 import {TFile} from 'obsidian';
-import integerToRGBA from "./util";
+import * as utilsFunctions from "./util";
 
 export function generateOutput(listOfAnnotations: Annotation[], mrexptTFile: TFile, colorFilter: number, enableNewExporter: boolean): string {
     const sample = listOfAnnotations[0];
@@ -17,15 +17,15 @@ tags:
 ---
 
 `;
-
+    
     for (const annotation of listOfAnnotations.filter(t=>t.signedColor == colorFilter)) {
-        let annotationAsString: string;
-        if (annotation.highlightText) {
-            annotationAsString = `${template(annotation, enableNewExporter)}\n`;
-        }
-        if (annotationAsString) {
-            output += annotationAsString;
-        }
+			let annotationAsString: string;
+			if (annotation.highlightText) {
+				annotationAsString = `${template(annotation, enableNewExporter)}\n`;
+			}
+			if (annotationAsString) {
+				output += annotationAsString;
+					}
     }
 
     return output;
@@ -49,13 +49,8 @@ ${highlight.split("\n").map(t=>`> ${t}`).join("\n")}
 ${note.split("\n").map(t=>`> ${t}`).join("\n")}
 `;
 	} else {
-		if (highlight.includes("\n")) {
-			highlight = highlight.replaceAll("\n", "\n> ");
-		}
-		return `> [!${(integerToRGBA(annotation.signedColor))}]
-> ${highlight}
-> ***
-> ${note}
-`;
+		highlight = utilsFunctions.cleanText(highlight);
+		note = utilsFunctions.cleanText(note);
+		return `- ${(utilsFunctions.RGBAToEmoji(utilsFunctions.integerToRGBA(annotation.signedColor)))} ${highlight} (Location ${annotation.location} on [[${(utilsFunctions.unixTimestampToDate(annotation.unixTimestamp))}]]) ${note}`;
 	}
 }
