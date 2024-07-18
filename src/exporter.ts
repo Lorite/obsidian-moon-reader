@@ -17,15 +17,23 @@ tags:
 ---
 
 `;
-    
-    for (const annotation of listOfAnnotations.filter(t=>t.signedColor == colorFilter)) {
+
+	let currentSectionNumber = 0;
+    for (const annotation of listOfAnnotations) {
+		if (colorFilter == 0 || annotation.signedColor == colorFilter) {
 			let annotationAsString: string;
+			if (annotation.sectionNumber != currentSectionNumber) {
+				currentSectionNumber = annotation.sectionNumber;
+				output += `## Section ${currentSectionNumber}\n\n`;
+			}
+
 			if (annotation.highlightText) {
 				annotationAsString = `${template(annotation, enableNewExporter)}\n`;
 			}
 			if (annotationAsString) {
 				output += annotationAsString;
-					}
+			}
+		}
     }
 
     return output;
