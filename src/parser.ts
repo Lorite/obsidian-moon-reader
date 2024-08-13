@@ -44,3 +44,19 @@ export async function parse(
 		console.log(e);
 	}
 }
+
+export async function parseChapters(
+	chaptersFile: TFile
+): Promise<string[]> {
+	try {
+		const chaptersContent = await this
+			.app
+			.vault
+			.read(chaptersFile)
+		;
+		return chaptersContent.split("\n");
+	} catch (e) {
+		new Notice("Error: Check console for logs.");
+		console.log(e);
+	}
+}

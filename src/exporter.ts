@@ -2,7 +2,7 @@ import {Annotation} from 'src/types';
 import {TFile} from 'obsidian';
 import * as utilsFunctions from "./util";
 
-export function generateOutput(listOfAnnotations: Annotation[], mrexptTFile: TFile, colorFilter: number, enableNewExporter: boolean): string {
+export function generateOutput(listOfAnnotations: Annotation[], mrexptTFile: TFile, mrexptChoiceChapters: string[], colorFilter: number, enableNewExporter: boolean): string {
     const sample = listOfAnnotations[0];
     //TODO: extract into template
     // TODO: last exported ID is likely broken
@@ -24,7 +24,10 @@ tags:
 			let annotationAsString: string;
 			if (annotation.sectionNumber != currentSectionNumber) {
 				currentSectionNumber = annotation.sectionNumber;
-				output += `## Section ${currentSectionNumber}\n\n`;
+				if (mrexptChoiceChapters.length >= currentSectionNumber)
+					output += `${mrexptChoiceChapters[currentSectionNumber]}\n\n`;
+				else
+					output += `## Section ${currentSectionNumber}\n\n`;
 			}
 
 			if (annotation.highlightText) {

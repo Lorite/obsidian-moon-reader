@@ -1,6 +1,6 @@
 import { Notice, Plugin, TFolder, TFile, TAbstractFile } from 'obsidian';
 import { ExportSelecter } from 'src/suggester';
-import { parse } from "src/parser";
+import { parse, parseChapters } from "src/parser";
 import { generateOutput } from 'src/exporter';
 import { SettingsTab } from './settings';
 import { ColorPicker } from 'src/colorpicker';
@@ -42,9 +42,9 @@ export default class MoonReader extends Plugin {
 			.app
 			.vault
 			.getAbstractFileByPath(rootPath);
-		let exportedFiles: TFile[];
+		let exportedFilesMREXPT: TFile[];
 		if (exportTFolder instanceof TFolder) {
-			exportedFiles = exportTFolder
+			exportedFilesMREXPT = exportTFolder
 				.children
 				?.filter(
 					(t) => (t instanceof TFile) && t.basename && t.extension == `mrexpt`
@@ -55,17 +55,37 @@ export default class MoonReader extends Plugin {
 			new Notice("Invalid Folder Path");
 			return;
 		}
-		if (!exportedFiles.length) {
+		if (!exportedFilesMREXPT.length) {
 			new Notice("Folder does not have any Moon+ Reader exports!");
 			return;
 		}
-		const suggesterModal = new ExportSelecter(this.app, exportedFiles);
+		const suggesterModalMREXPT = new ExportSelecter(this.app, exportedFilesMREXPT);
 		//TODO: raise error for no input?
-		const mrexptChoice = await suggesterModal.openAndGetValue().catch(e => { new Notice("Prompt cancelled"); }) as TFile;
+		const mrexptChoice = await suggesterModalMREXPT.openAndGetValue().catch(e => { new Notice("Prompt cancelled"); }) as TFile;
+		if (!mrexptChoice) {
+			return;
+		}
+
+		let exportedFilesChapters: TFile[];
+		if (exportTFolder instanceof TFolder) {
+			exportedFilesChapters = exportTFolder
+				.children
+				?.filter(
+					(t) => (t instanceof TFile) && t.basename && t.extension == `txt`
+				)
+				.map(t => t as TFile);
+		} else {
+			//sanity check
+			new Notice("Invalid Folder Path");
+			return;
+		}
+		const suggesterModalChapters = new ExportSelecter(this.app, exportedFilesChapters);
+		const mrexptChaptersChoice = await suggesterModalChapters.openAndGetValue().catch(e => { new Notice("Prompt cancelled"); }) as TFile;
 		if (!mrexptChoice) {
 			return;
 		}
 		const parsedOutput = await parse(mrexptChoice);
+		const mrexptChoiceChaptersTitles = await parseChapters(mrexptChaptersChoice) as string[];
 		if (parsedOutput) {
 			const colorChoices = new Set<number>();
 			parsedOutput.forEach(t => colorChoices.add(t.signedColor))
@@ -73,7 +93,7 @@ export default class MoonReader extends Plugin {
 			const colorModal = new ColorPicker(this.app, Array.from(colorChoices));
 			const colorChoice = await colorModal.openAndGetValue()
 			// .catch(e=>console.log(e));
-			await this.app.vault.append(currentTFile, generateOutput(parsedOutput, mrexptChoice, colorChoice, this.settings.enableSRSSupport));
+			await this.app.vault.append(currentTFile, generateOutput(parsedOutput, mrexptChoice, mrexptChoiceChaptersTitles, colorChoice, this.settings.enableSRSSupport));
 		} else {
 			new Notice("Nothing added!");
 		}
