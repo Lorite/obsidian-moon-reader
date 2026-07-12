@@ -62,6 +62,6 @@ ${note.split("\n").map(t=>`> ${t}`).join("\n")}
 	} else {
 		highlight = utilsFunctions.cleanText(highlight);
 		note = utilsFunctions.cleanText(note);
-		return `- ${(utilsFunctions.RGBAToEmoji(utilsFunctions.integerToRGBA(annotation.signedColor)))} ${highlight} (Location ${annotation.location} on [[${(utilsFunctions.unixTimestampToDate(annotation.unixTimestamp))}]]) ${note}`;
+		return `- ${utilsFunctions.formatHighlight(utilsFunctions.integerToRGBA(annotation.signedColor), highlight)} (Location ${annotation.location} on [[${(utilsFunctions.unixTimestampToDate(annotation.unixTimestamp))}]]) ${note}`;
 	}
 }
